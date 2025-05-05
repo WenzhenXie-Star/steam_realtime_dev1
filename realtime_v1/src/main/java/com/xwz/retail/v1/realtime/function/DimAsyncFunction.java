@@ -18,11 +18,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * @Package com.xwz.retail.v1.realtime.function.DimAsyncFunction
- * @Author  Wenzhen.Xie
- * @Date  2025/4/23 15:07
- * @description: 
-*/
+ * @Package com.lzy.stream.realtime.v1.function.DimAsyncFunction
+ * @Author zheyuan.liu
+ * @Date 2025/4/17 14:31
+ * @description: DimAsyncFunction
+ */
+
 
 public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T,T> implements DimJoinFunction<T> {
     private AsyncConnection hbaseAsyncConn;
@@ -93,3 +94,4 @@ public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T,T> impleme
         );
     }
 }
+

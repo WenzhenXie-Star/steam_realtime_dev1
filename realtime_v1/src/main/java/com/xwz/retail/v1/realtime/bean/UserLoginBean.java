@@ -6,11 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @Package com.xwz.retail.v1.realtime.bean.CartAddUuBean
- * @Author  Wenzhen.Xie
- * @Date  2025/4/8 13:51
- * @description:
+ * @Package com.lzy.retail.v1.realtime.bean.UserLoginBean
+ * @Author zheyuan.liu
+ * @Date 2025/4/8 9:01
+ * @description: UserLoginBean
  */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,4 +30,3 @@ public class UserLoginBean {
     @JSONField(serialize = false)
     Long ts;
 }
-

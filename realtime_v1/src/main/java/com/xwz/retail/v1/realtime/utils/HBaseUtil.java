@@ -17,12 +17,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @Package com.xwz.retail.v1.realtime.flink_app.dim.Dim_App
- * @Author  Wenzhen.Xie
- * @Date  2025/4/10 22:17
- * @description:
+ * @author Felix
+ * @date 2024/5/27
+ * 操作HBase的工具类
  */
-//操作HBase的工具类
 public class HBaseUtil {
     //获取Hbase连接
     public static Connection getHBaseConnection() throws IOException {
@@ -222,7 +220,7 @@ public class HBaseUtil {
 
     public static void main(String[] args) throws Exception {
         Connection hBaseConnection = getHBaseConnection();
-        JSONObject jsonObj = getRow(hBaseConnection, Constant.HBASE_NAMESPACE, "dim_base_trademark", "1", JSONObject.class);
+        JSONObject jsonObj = getRow(hBaseConnection, Constant.HBASE_NAMESPACE, "dim_trademark", "1", JSONObject.class);
         System.out.println(jsonObj);
         closeHBaseConnection(hBaseConnection);
     }

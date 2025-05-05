@@ -1,5 +1,7 @@
 package com.xwz.retail.v1.realtime.utils;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -16,6 +18,11 @@ public class DateFormatUtil {
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter dtfForPartition = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter dtfFull = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public static Integer now(){
+        String yyyyMMdd = DateFormatUtils.format(new Date(), "yyyyMMdd");
+        return Integer.valueOf(yyyyMMdd);
+    }
 
     /**
      * 2023-07-05 01:01:01 转成 ms 值

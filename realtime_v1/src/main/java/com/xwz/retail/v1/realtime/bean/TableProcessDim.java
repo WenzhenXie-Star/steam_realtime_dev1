@@ -5,31 +5,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @Package com.xwz.retail.v1.realtime.bean.CartAddUuBean
- * @Author  Wenzhen.Xie
- * @Date  2025/4/8 13:51
- * @description:
+ * @Package com.lzy.retail.v1.realtime.bean.TableProcessDim
+ * @Author zheyuan.liu
+ * @Date 2025/4/8 8:47
+ * @description: TableProcessDim
  */
-@Data
-@NoArgsConstructor
+
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class TableProcessDim {
-    // 来源表名
     String sourceTable;
-
-    // 目标表名
     String sinkTable;
-
-    // 输出字段
     String sinkColumns;
-
-    // 数据到 hbase 的列族
     String sinkFamily;
-
-    // sink到 hbase 的时候的主键字段
     String sinkRowKey;
-
-    // 配置表操作类型
     String op;
-
 }

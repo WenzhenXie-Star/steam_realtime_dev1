@@ -14,9 +14,9 @@ public class SQLUtil {
         return " WITH (\n" +
                 "  'connector' = 'kafka',\n" +
                 "  'topic' = '" + topic + "',\n" +
-                "  'properties.bootstrap.servers' = 'hadoop102:9092',\n" +
+                "  'properties.bootstrap.servers' = 'cdh01:9092,cdh02:9092,cdh03:9092',\n" +
                 "  'properties.group.id' = '" + groupId + "',\n" +
-                "  'scan.startup.mode' = 'latest-offset',\n" +
+                "  'scan.startup.mode' = 'earliest-offset',\n" +
                 "  'format' = 'json'\n" +
                 ")";
     }
@@ -26,7 +26,7 @@ public class SQLUtil {
         return " WITH (\n" +
                 " 'connector' = 'hbase-2.2',\n" +
                 " 'table-name' = '" + Constant.HBASE_NAMESPACE + ":" + tableName + "',\n" +
-                " 'zookeeper.quorum' = 'hadoop102,hadoop103,hadoop104:2181',\n" +
+                " 'zookeeper.quorum' = 'cdh01:2181,cdh02:2181,cdh03:2181',\n" +
                 " 'lookup.async' = 'true',\n" +
                 " 'lookup.cache' = 'PARTIAL',\n" +
                 " 'lookup.partial-cache.max-rows' = '500',\n" +

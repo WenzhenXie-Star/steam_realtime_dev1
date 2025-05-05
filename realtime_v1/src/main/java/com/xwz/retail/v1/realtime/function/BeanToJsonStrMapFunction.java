@@ -6,10 +6,12 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import org.apache.flink.api.common.functions.MapFunction;
 
 /**
- * @author Felix
- * @date 2024/6/11
- * 将流中对象转换为json格式字符串
+ * @Package com.lzy.stream.realtime.v1.function.BeanToJsonStrMapFunction
+ * @Author zheyuan.liu
+ * @Date 2025/4/14 14:29
+ * @description: BeanToJsonStrMapFunction
  */
+
 public class BeanToJsonStrMapFunction<T> implements MapFunction<T, String> {
     @Override
     public String map(T bean) throws Exception {

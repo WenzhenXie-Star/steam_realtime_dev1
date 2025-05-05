@@ -9,14 +9,15 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 /**
- * @Package com.xwz.retail.v1.realtime.bean.CartAddUuBean
- * @Author  Wenzhen.Xie
- * @Date  2025/4/8 13:51
- * @description:
+ * @Package com.lzy.retail.v1.realtime.bean.TradeProvinceOrderBean
+ * @Author zheyuan.liu
+ * @Date 2025/4/8 8:49
+ * @description: TradeProvinceOrderBean
  */
+
 @Data
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 public class TradeProvinceOrderBean {
     // 窗口起始时间
     String stt;
@@ -37,7 +38,7 @@ public class TradeProvinceOrderBean {
 
     // 时间戳
     @JSONField(serialize = false)
-    Long ts;
+    Long ts_ms;
 
     @JSONField(serialize = false)
     Set<String> orderIdSet;

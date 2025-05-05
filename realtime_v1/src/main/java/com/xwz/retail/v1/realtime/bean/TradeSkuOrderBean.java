@@ -9,11 +9,12 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 /**
- * @Package com.xwz.retail.v1.realtime.bean.CartAddUuBean
- * @Author  Wenzhen.Xie
- * @Date  2025/4/8 13:51
- * @description:
+ * @Package com.lzy.stream.realtime.v1.bean.TradeSkuOrderBean
+ * @Author zheyuan.liu
+ * @Date 2025/4/18 14:07
+ * @description: TradeSkuOrderBean
  */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -59,6 +60,5 @@ public class TradeSkuOrderBean {
     BigDecimal orderAmount;
     // 时间戳
     @JSONField(serialize = false)
-    Long ts;
+    Long ts_ms;
 }
-

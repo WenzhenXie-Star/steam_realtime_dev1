@@ -11,43 +11,70 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * @Package com.xwz.retail.v1.realtime.utils.RedisUtil
- * @Author  Wenzhen.Xie
- * @Date  2025/4/23 14:40
- * @description: 
-*/
-
+ * @author Felix
+ * @date 2024/6/12
+ * 操作Redis的工具类
+ * 旁路缓存
+ *      思路：先从缓存中获取维度数据，如果获取到了(缓存命中)，直接将缓存中的维度返回；如果在缓存中没有找到要关联的维度，发送请求到HBase中查询维度，
+ *           并将查询的结果放到缓存中缓存起来，方便下次查询使用
+ *      选型：
+ *          状态：             性能很好，维护性差
+ *          redis:            性能不错，维护性好     √
+ *      关于Redis的一些设置
+ *          key:    维度表名:主键值
+ *          type:   string
+ *          expire: 1day   避免冷数据常驻内存，给内存带来压力
+ *          注意：如果维度数据发生了变化，需要将缓存的数据清除掉
+ */
 public class RedisUtil {
     private static JedisPool jedisPool;
     static {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMinIdle(5);
-        jedisPoolConfig.setMaxTotal(100);
-        jedisPoolConfig.setMaxIdle(5);
+        jedisPoolConfig.setMaxTotal(200);
+        jedisPoolConfig.setMaxIdle(50);
+        jedisPoolConfig.setMinIdle(10);
         jedisPoolConfig.setBlockWhenExhausted(true);
         jedisPoolConfig.setMaxWaitMillis(2000);
         jedisPoolConfig.setTestOnBorrow(true);
-        jedisPool = new JedisPool(jedisPoolConfig,"hadoop102",6379,10000);
+        String password = "123456";
+
+        jedisPool = new JedisPool(jedisPoolConfig, "cdh03", 6379 , 10000, password);
     }
 
-    //获取Jedis
-    public static Jedis getJedis(){
+    // 获取Jedis
+    public static Jedis getJedis() {
         System.out.println("~~~获取Jedis客户端~~~");
-        Jedis jedis = jedisPool.getResource();
-        return jedis;
+        try {
+            return jedisPool.getResource();
+        } catch (Exception e) {
+            System.err.println("获取 Jedis 连接失败: " + e.getMessage());
+            return null;
+        }
     }
-    //关闭Jedis
-    public static void closeJedis(Jedis jedis){
-        System.out.println("~~~获取Jedis客户端~~~");
-        if(jedis != null){
-            jedis.close();
+
+    // 关闭Jedis
+    public static void closeJedis(Jedis jedis) {
+        System.out.println("~~~关闭Jedis客户端~~~");
+        if (jedis != null) {
+            try {
+                jedis.close();
+            } catch (Exception e) {
+                System.err.println("关闭 Jedis 连接失败: " + e.getMessage());
+            }
+        }
+    }
+
+    // 关闭连接池
+    public static void closePool() {
+        if (jedisPool != null && !jedisPool.isClosed()) {
+            jedisPool.close();
         }
     }
 
     //获取异步操作Redis的连接对象
     public static StatefulRedisConnection<String,String> getRedisAsyncConnection(){
         System.out.println("~~~获取异步操作Redis的客户端~~~");
-        RedisClient redisClient = RedisClient.create("redis://hadoop102:6379/0");
+        RedisClient redisClient = RedisClient.create("redis://123456@cdh03:6379/");
         return redisClient.connect();
     }
     //关闭异步操作Redis的连接对象
@@ -59,7 +86,7 @@ public class RedisUtil {
     }
 
     //以异步的方式从Redis中取数据
-    public static JSONObject readDimAsync(StatefulRedisConnection<String,String> asyncRedisConn, String tableName, String id){
+    public static JSONObject readDimAsync(StatefulRedisConnection<String,String> asyncRedisConn,String tableName,String id){
         RedisAsyncCommands<String, String> asyncCommands = asyncRedisConn.async();
         String key = getKey(tableName, id);
         try {

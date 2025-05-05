@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Package com.xwz.retail.v1.realtime.utils;
- * @Author  Wenzhen.Xie
- * @date 2025/4/23
- * @description:
+ * @Package com.lzy.stream.realtime.v1.utils.KeywordUtil
+ * @Author zheyuan.liu
+ * @Date 2025/4/18 18:58
+ * @description: KeywordUtil
  */
+
 public class KeywordUtil {
     //分词
     public static List<String> analyze(String text){

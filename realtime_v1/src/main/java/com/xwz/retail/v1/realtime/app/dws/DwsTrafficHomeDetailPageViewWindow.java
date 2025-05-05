@@ -1,13 +1,12 @@
-package com.xwz.retail.v1.realtime.flink_app.dws;
+package com.xwz.retail.v1.realtime.app.dws;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.xwz.retail.v1.realtime.base.BaseApp;
 import com.xwz.retail.v1.realtime.bean.TrafficHomeDetailPageViewBean;
-import com.xwz.retail.v1.realtime.constant.Constant;
 import com.xwz.retail.v1.realtime.function.BeanToJsonStrMapFunction;
 import com.xwz.retail.v1.realtime.utils.DateFormatUtil;
 import com.xwz.retail.v1.realtime.utils.FlinkSinkUtil;
+import com.xwz.retail.v1.realtime.utils.FlinkSourceUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -18,43 +17,45 @@ import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.AllWindowedStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
-import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 /**
- * @Package com.xwz.retail.v1.realtime.flink_app.dws.Dws_Traffic_Home_Detail_Page_View_Window
- * @Author  Wenzhen.Xie
- * @Date  2025/4/23 15:30
- * @description: 
-*/
+ * @Package com.lzy.stream.realtime.v1.app.dws.DwsTrafficHomeDetailPageViewWindow
+ * @Author zheyuan.liu
+ * @Date 2025/4/18 15:03
+ * @description: DwsTrafficHomeDetailPageViewWindow
+ */
 
-public class Dws_Traffic_Home_Detail_Page_View_Window extends BaseApp {
+public class DwsTrafficHomeDetailPageViewWindow {
     public static void main(String[] args) throws Exception {
-        new Dws_Traffic_Home_Detail_Page_View_Window().start(
-                10023,
-                4,
-                "dws_traffic_home_detail_page_view_window",
-                Constant.TOPIC_DWD_TRAFFIC_PAGE
-        );
-    }
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-    @Override
-    public void handle(StreamExecutionEnvironment env, DataStreamSource<String> kafkaStrDS) {
+        env.setParallelism(1);
+
+        env.enableCheckpointing(5000L, CheckpointingMode.EXACTLY_ONCE);
+
+        KafkaSource<String> kafkaSource = FlinkSourceUtil.getKafkaSource("dwd_traffic_page", "dws_traffic_home_detail_page_view_window");
+
+        DataStreamSource<String> kafkaStrDS = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "Kafka_Source");
+
         //TODO 1.对流中数据类型进行转换   jsonStr->jsonObj
         SingleOutputStreamOperator<JSONObject> jsonObjDS = kafkaStrDS.map(JSON::parseObject);
         //TODO 2.过滤首页以及详情页
         SingleOutputStreamOperator<JSONObject> filterDS = jsonObjDS.filter(
                 new FilterFunction<JSONObject>() {
                     @Override
-                    public boolean filter(JSONObject jsonObj) throws Exception {
+                    public boolean filter(JSONObject jsonObj) {
                         String pageId = jsonObj.getJSONObject("page").getString("page_id");
                         return "home".equals(pageId) || "good_detail".equals(pageId);
                     }
@@ -83,14 +84,14 @@ public class Dws_Traffic_Home_Detail_Page_View_Window extends BaseApp {
                     private ValueState<String> detailLastVisitDateState;
 
                     @Override
-                    public void open(Configuration parameters) throws Exception {
+                    public void open(Configuration parameters) {
                         ValueStateDescriptor<String> homeValueStateDescriptor
-                                = new ValueStateDescriptor<String>("homeLastVisitDateState", String.class);
+                                = new ValueStateDescriptor<>("homeLastVisitDateState", String.class);
                         homeValueStateDescriptor.enableTimeToLive(StateTtlConfig.newBuilder(Time.days(1)).build());
                         homeLastVisitDateState = getRuntimeContext().getState(homeValueStateDescriptor);
 
                         ValueStateDescriptor<String> detailValueStateDescriptor
-                                = new ValueStateDescriptor<String>("detailLastVisitDateState", String.class);
+                                = new ValueStateDescriptor<>("detailLastVisitDateState", String.class);
                         detailValueStateDescriptor.enableTimeToLive(StateTtlConfig.newBuilder(Time.days(1)).build());
                         detailLastVisitDateState = getRuntimeContext().getState(detailValueStateDescriptor);
 
@@ -102,8 +103,8 @@ public class Dws_Traffic_Home_Detail_Page_View_Window extends BaseApp {
 
                         Long ts = jsonObj.getLong("ts");
                         String curVisitDate = DateFormatUtil.tsToDate(ts);
-                        Long homeUvCt = 0L;
-                        Long detailUvCt = 0L;
+                        long homeUvCt = 0L;
+                        long detailUvCt = 0L;
 
                         if ("home".equals(pageId)) {
                             //获取首页的上次访问日期
@@ -130,23 +131,25 @@ public class Dws_Traffic_Home_Detail_Page_View_Window extends BaseApp {
                     }
                 }
         );
-        //beanDS.print();
+//        beanDS.print();
         //TODO 6.开窗
-        AllWindowedStream<TrafficHomeDetailPageViewBean, TimeWindow> windowDS = beanDS.windowAll(TumblingEventTimeWindows.of(org.apache.flink.streaming.api.windowing.time.Time.seconds(10)));
+        AllWindowedStream<TrafficHomeDetailPageViewBean, TimeWindow> windowDS = beanDS
+                .windowAll(TumblingEventTimeWindows.of(org.apache.flink.streaming.api.windowing.time.Time.seconds(10)));
         //TODO 7.聚合
         SingleOutputStreamOperator<TrafficHomeDetailPageViewBean> reduceDS = windowDS.reduce(
                 new ReduceFunction<TrafficHomeDetailPageViewBean>() {
                     @Override
-                    public TrafficHomeDetailPageViewBean reduce(TrafficHomeDetailPageViewBean value1, TrafficHomeDetailPageViewBean value2) throws Exception {
+                    public TrafficHomeDetailPageViewBean reduce(TrafficHomeDetailPageViewBean value1, TrafficHomeDetailPageViewBean value2) {
                         value1.setHomeUvCt(value1.getHomeUvCt() + value2.getHomeUvCt());
                         value1.setGoodDetailUvCt(value1.getGoodDetailUvCt() + value2.getGoodDetailUvCt());
                         return value1;
                     }
                 },
-                new AllWindowFunction<TrafficHomeDetailPageViewBean, TrafficHomeDetailPageViewBean, TimeWindow>() {
+                new ProcessAllWindowFunction<TrafficHomeDetailPageViewBean, TrafficHomeDetailPageViewBean, TimeWindow>() {
                     @Override
-                    public void apply(TimeWindow window, Iterable<TrafficHomeDetailPageViewBean> values, Collector<TrafficHomeDetailPageViewBean> out) throws Exception {
-                        TrafficHomeDetailPageViewBean viewBean = values.iterator().next();
+                    public void process(ProcessAllWindowFunction<TrafficHomeDetailPageViewBean, TrafficHomeDetailPageViewBean, TimeWindow>.Context context, Iterable<TrafficHomeDetailPageViewBean> elements, Collector<TrafficHomeDetailPageViewBean> out) {
+                        TrafficHomeDetailPageViewBean viewBean = elements.iterator().next();
+                        TimeWindow window = context.window();
                         String stt = DateFormatUtil.tsToDateTime(window.getStart());
                         String edt = DateFormatUtil.tsToDateTime(window.getEnd());
                         String curDate = DateFormatUtil.tsToDate(window.getStart());
@@ -157,10 +160,16 @@ public class Dws_Traffic_Home_Detail_Page_View_Window extends BaseApp {
                     }
                 }
         );
-        //TODO 8.将聚合的结果写到Doris
-        reduceDS.print();
-        reduceDS
-                .map(new BeanToJsonStrMapFunction<TrafficHomeDetailPageViewBean>())
-                .sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_home_detail_page_view_window"));
+
+        SingleOutputStreamOperator<String> jsonMap = reduceDS
+                .map(new BeanToJsonStrMapFunction<>());
+
+        jsonMap.print();
+
+        jsonMap.sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_home_detail_page_view_window"));
+
+        env.execute("DwsTrafficHomeDetailPageViewWindow");
+
     }
+
 }

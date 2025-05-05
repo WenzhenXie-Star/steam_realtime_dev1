@@ -1,18 +1,18 @@
-package com.xwz.retail.v1.realtime.flink_app.dws;
+package com.xwz.retail.v1.realtime.app.dws;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.xwz.retail.v1.realtime.base.BaseApp;
-import com.xwz.retail.v1.realtime.bean.TrafficPageViewBean;
-import com.xwz.retail.v1.realtime.constant.Constant;
+import com.xwz.retail.v1.realtime.bean.TrafficVcChArIsNewPageViewBean;
 import com.xwz.retail.v1.realtime.function.BeanToJsonStrMapFunction;
 import com.xwz.retail.v1.realtime.utils.DateFormatUtil;
 import com.xwz.retail.v1.realtime.utils.FlinkSinkUtil;
+import com.xwz.retail.v1.realtime.utils.FlinkSourceUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
@@ -20,6 +20,8 @@ import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -31,43 +33,47 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 /**
- * @Package com.xwz.retail.v1.realtime.flink_app.dws.Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window
- * @Author  Wenzhen.Xie
- * @Date  2025/4/23 15:39
- * @description: 
-*/
+ * @Package com.lzy.stream.realtime.v1.app.dws.DwsTrafficVcChArIsNewPageViewWindow
+ * @Author zheyuan.liu
+ * @Date 2025/4/21 9:37
+ * @description: DwsTrafficVcChArIsNewPageViewWindow
+ */
 
-public class Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window extends BaseApp {
+public class DwsTrafficVcChArIsNewPageViewWindow {
     public static void main(String[] args) throws Exception {
-        new Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window().start(
-                10022,
-                4,
-                "dws_traffic_vc_ch_ar_is_new_page_view_window",
-                Constant.TOPIC_DWD_TRAFFIC_PAGE
-        );
-    }
-    @Override
-    public void handle(StreamExecutionEnvironment env, DataStreamSource<String> kafkaStrDS) {
-        //TODO 1.对流中数据进行类型转换    jsonStr->jsonObj
-        SingleOutputStreamOperator<JSONObject> jsonObjDS = kafkaStrDS.map(JSON::parseObject);
-        //TODO 2.按照mid对流中数据进行分组（计算UV）
-        KeyedStream<JSONObject, String> midKeyedDS = jsonObjDS.keyBy(jsonObj -> jsonObj.getJSONObject("common").getString("mid"));
-        //TODO 3.再次对流中数据进行类型转换  jsonObj->统计的实体类对象
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        SingleOutputStreamOperator<TrafficPageViewBean> beanDS = midKeyedDS.map(
-                new RichMapFunction<JSONObject, TrafficPageViewBean>() {
+        env.setParallelism(1);
+
+        env.enableCheckpointing(5000L, CheckpointingMode.EXACTLY_ONCE);
+
+        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,3000L));
+
+        KafkaSource<String> kafkaSource = FlinkSourceUtil.getKafkaSource("dwd_traffic_page", "dws_traffic_vc_ch_ar_is_new_page_view_window");
+
+        DataStreamSource<String> kafkaStrDS = env
+                .fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "Kafka_Source");
+
+//        kafkaStrDS.print();
+
+        SingleOutputStreamOperator<JSONObject> jsonObjDS = kafkaStrDS.map(JSON::parseObject);
+
+        KeyedStream<JSONObject, String> midKeyedDS = jsonObjDS.keyBy(jsonObj -> jsonObj.getJSONObject("common").getString("mid"));
+
+        SingleOutputStreamOperator<TrafficVcChArIsNewPageViewBean> beanDS = midKeyedDS.map(
+                new RichMapFunction<JSONObject, TrafficVcChArIsNewPageViewBean>() {
                     private ValueState<String> lastVisitDateState;
 
                     @Override
-                    public void open(Configuration parameters) throws Exception {
+                    public void open(Configuration parameters) {
                         ValueStateDescriptor<String> valueStateDescriptor
-                                = new ValueStateDescriptor<String>("lastVisitDateState",String.class);
+                                = new ValueStateDescriptor<>("lastVisitDateState", String.class);
                         valueStateDescriptor.enableTimeToLive(StateTtlConfig.newBuilder(Time.days(1)).build());
                         lastVisitDateState = getRuntimeContext().getState(valueStateDescriptor);
                     }
 
                     @Override
-                    public TrafficPageViewBean map(JSONObject jsonObj) throws Exception {
+                    public TrafficVcChArIsNewPageViewBean map(JSONObject jsonObj) throws Exception {
                         JSONObject commonJsonObj = jsonObj.getJSONObject("common");
                         JSONObject pageJsonObj = jsonObj.getJSONObject("page");
 
@@ -76,7 +82,7 @@ public class Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window extends BaseApp {
                         //获取当前访问日期
                         Long ts = jsonObj.getLong("ts");
                         String curVisitDate = DateFormatUtil.tsToDate(ts);
-                        Long uvCt = 0L;
+                        long uvCt = 0L;
                         if(StringUtils.isEmpty(lastVisitDate) || !lastVisitDate.equals(curVisitDate)){
                             uvCt = 1L;
                             lastVisitDateState.update(curVisitDate);
@@ -86,7 +92,7 @@ public class Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window extends BaseApp {
 
                         Long svCt = StringUtils.isEmpty(lastPageId) ? 1L : 0L ;
 
-                        return new TrafficPageViewBean(
+                        return new TrafficVcChArIsNewPageViewBean(
                                 "",
                                 "",
                                 "",
@@ -103,28 +109,28 @@ public class Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window extends BaseApp {
                     }
                 }
         );
-        //beanDS.print();
 
-        //TODO 4.指定Watermark以及提取事件时间字段
-        SingleOutputStreamOperator<TrafficPageViewBean> withWatermarkDS = beanDS.assignTimestampsAndWatermarks(
-                //WatermarkStrategy.<TrafficPageViewBean>forBoundedOutOfOrderness(Duration.ofSeconds(3))
+//        beanDS.print();
+
+        SingleOutputStreamOperator<TrafficVcChArIsNewPageViewBean> withWatermarkDS = beanDS.assignTimestampsAndWatermarks(
                 WatermarkStrategy
-                        .<TrafficPageViewBean>forMonotonousTimestamps()
+                        .<TrafficVcChArIsNewPageViewBean>forMonotonousTimestamps()
                         .withTimestampAssigner(
-                                new SerializableTimestampAssigner<TrafficPageViewBean>() {
+                                new SerializableTimestampAssigner<TrafficVcChArIsNewPageViewBean>() {
                                     @Override
-                                    public long extractTimestamp(TrafficPageViewBean bean, long recordTimestamp) {
+                                    public long extractTimestamp(TrafficVcChArIsNewPageViewBean bean, long recordTimestamp) {
                                         return bean.getTs();
                                     }
                                 }
                         )
         );
 
-        //TODO 5.分组--按照统计的维度进行分组
-        KeyedStream<TrafficPageViewBean, Tuple4<String, String, String, String>> dimKeyedDS = withWatermarkDS.keyBy(
-                new KeySelector<TrafficPageViewBean, Tuple4<String, String, String, String>>() {
+//        withWatermarkDS.print();
+
+        KeyedStream<TrafficVcChArIsNewPageViewBean, Tuple4<String, String, String, String>> dimKeyedDS = withWatermarkDS.keyBy(
+                new KeySelector<TrafficVcChArIsNewPageViewBean, Tuple4<String, String, String, String>>() {
                     @Override
-                    public Tuple4<String, String, String, String> getKey(TrafficPageViewBean bean) throws Exception {
+                    public Tuple4<String, String, String, String> getKey(TrafficVcChArIsNewPageViewBean bean) {
                         return Tuple4.of(bean.getVc(),
                                 bean.getCh(),
                                 bean.getAr(),
@@ -133,21 +139,13 @@ public class Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window extends BaseApp {
                 }
         );
 
-        //TODO 6.开窗
-        //以滚动事件时间窗口为例，分析如下几个窗口相关的问题
-        //窗口对象时候创建:当属于这个窗口的第一个元素到来的时候创建窗口对象
-        //窗口的起始结束时间（窗口为什么是左闭右开的）
-        //向下取整：long start =TimeWindow.getWindowStartWithOffset(timestamp, (globalOffset + staggerOffset) % size, size);
-        //窗口什么时候触发计算  window.maxTimestamp() <= ctx.getCurrentWatermark()
-        //窗口什么时候关闭     watermark >= window.maxTimestamp() + allowedLateness
-        WindowedStream<TrafficPageViewBean, Tuple4<String, String, String, String>, TimeWindow> windowDS
+        WindowedStream<TrafficVcChArIsNewPageViewBean, Tuple4<String, String, String, String>, TimeWindow> windowDS
                 = dimKeyedDS.window(TumblingEventTimeWindows.of(org.apache.flink.streaming.api.windowing.time.Time.seconds(10)));
 
-        //TODO 7.聚合计算
-        SingleOutputStreamOperator<TrafficPageViewBean> reduceDS = windowDS.reduce(
-                new ReduceFunction<TrafficPageViewBean>() {
+        SingleOutputStreamOperator<TrafficVcChArIsNewPageViewBean> reduceDS = windowDS.reduce(
+                new ReduceFunction<TrafficVcChArIsNewPageViewBean>() {
                     @Override
-                    public TrafficPageViewBean reduce(TrafficPageViewBean value1, TrafficPageViewBean value2) throws Exception {
+                    public TrafficVcChArIsNewPageViewBean reduce(TrafficVcChArIsNewPageViewBean value1, TrafficVcChArIsNewPageViewBean value2) {
                         value1.setPvCt(value1.getPvCt() + value2.getPvCt());
                         value1.setUvCt(value1.getUvCt() + value2.getUvCt());
                         value1.setSvCt(value1.getSvCt() + value2.getSvCt());
@@ -155,10 +153,10 @@ public class Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window extends BaseApp {
                         return value1;
                     }
                 },
-                new WindowFunction<TrafficPageViewBean, TrafficPageViewBean, Tuple4<String, String, String, String>, TimeWindow>() {
+                new WindowFunction<TrafficVcChArIsNewPageViewBean, TrafficVcChArIsNewPageViewBean, Tuple4<String, String, String, String>, TimeWindow>() {
                     @Override
-                    public void apply(Tuple4<String, String, String, String> stringStringStringStringTuple4, TimeWindow window, Iterable<TrafficPageViewBean> input, Collector<TrafficPageViewBean> out) throws Exception {
-                        TrafficPageViewBean pageViewBean = input.iterator().next();
+                    public void apply(Tuple4<String, String, String, String> stringStringStringStringTuple4, TimeWindow window, Iterable<TrafficVcChArIsNewPageViewBean> input, Collector<TrafficVcChArIsNewPageViewBean> out) {
+                        TrafficVcChArIsNewPageViewBean pageViewBean = input.iterator().next();
                         String stt = DateFormatUtil.tsToDateTime(window.getStart());
                         String edt = DateFormatUtil.tsToDateTime(window.getEnd());
                         String curDate = DateFormatUtil.tsToDate(window.getStart());
@@ -169,12 +167,16 @@ public class Dws_Traffic_Vc_Ch_ArIs_New_Page_View_Window extends BaseApp {
                     }
                 }
         );
-        reduceDS.print();
 
-        //TODO 8.将聚合的结果写到Doris表
-        reduceDS
-                //在向Doris写数据前，将流中统计的实体类对象转换为json格式字符串
-                .map(new BeanToJsonStrMapFunction<TrafficPageViewBean>())
-                .sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_vc_ch_ar_is_new_page_view_window"));
+//        reduceDS.print();
+
+        SingleOutputStreamOperator<String> jsonMap = reduceDS
+                .map(new BeanToJsonStrMapFunction<>());
+
+        jsonMap.print();
+
+        jsonMap.sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_vc_ch_ar_is_new_page_view_window"));
+
+        env.execute("DwsTrafficVcChArIsNewPageViewWindow");
     }
 }

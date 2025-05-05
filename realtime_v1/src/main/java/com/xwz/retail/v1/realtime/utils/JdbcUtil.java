@@ -1,6 +1,5 @@
 package com.xwz.retail.v1.realtime.utils;
 
-
 import com.google.common.base.CaseFormat;
 import com.xwz.retail.v1.realtime.constant.Constant;
 import org.apache.commons.beanutils.BeanUtils;
