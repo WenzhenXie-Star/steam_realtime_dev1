@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * @Package com.lzy.retail.v1.realtime.bean.TrafficHomeDetailPageViewBean
- * @Author zheyuan.liu
+ * @Package com.xwz.retail.v1.realtime.bean.TrafficHomeDetailPageViewBean
+ * @Author Wenzhen.Xie
  * @Date 2025/4/8 8:52
  * @description: TrafficHomeDetailPageViewBean
  */

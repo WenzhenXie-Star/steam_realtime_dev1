@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Package com.lzy.stream.realtime.v1.app.bwd.DwdBaseLog
+ * @Package com.xwz.retail.v1.realtime.app.dwd.DwdBaseLog
  * @Author Wenzhen.Xie
  * @Date 2025/4/11 10:35
  * @description: DwdBaseLog

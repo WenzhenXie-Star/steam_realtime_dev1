@@ -10,7 +10,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 
 /**
- * @Package com.lzy.retail.v1.realtime.app.ods.MysqlToKafka
+ * @Package com.xwz.retail.v1.realtime.app.ods.MysqlToKafka
  * @Author Wenzhen.Xie
  * @Date 2025/4/9 16:25、.
  * @description: MysqlToKafka

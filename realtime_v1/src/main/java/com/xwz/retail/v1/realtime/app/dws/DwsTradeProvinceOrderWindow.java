@@ -35,7 +35,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Package com.lzy.stream.realtime.v1.app.dws.DwsTradeProvinceOrderWindow
+ * @Package com.xwz.retail.v1.realtime.app.dws.DwsTradeProvinceOrderWindow
  * @Author Wenzhen.Xie
  * @Date 2025/4/21 14:56
  * @description: DwsTradeProvinceOrderWindow

@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 /**
- * @Package com.lzy.retail.v1.realtime.bean.TradeProvinceOrderBean
- * @Author zheyuan.liu
+ * @Package com.xwz.retail.v1.realtime.bean.TradeProvinceOrderBean
+ * @Author Wenzhen.Xie
  * @Date 2025/4/8 8:49
  * @description: TradeProvinceOrderBean
  */

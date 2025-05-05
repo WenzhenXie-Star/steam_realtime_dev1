@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @Package com.lzy.retail.v1.realtime.bean.TableProcessDwd
- * @Author zheyuan.liu
+ * @Package com.xwz.retail.v1.realtime.bean.TableProcessDwd
+ * @Author Wenzhen.Xie
  * @Date 2025/4/8 11:05
  * @description: TableProcessDwd
  */

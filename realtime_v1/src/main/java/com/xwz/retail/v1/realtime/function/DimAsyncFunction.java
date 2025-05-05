@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * @Package com.lzy.stream.realtime.v1.function.DimAsyncFunction
+ * @Package com.xwz.stream.realtime.v1.function.DimAsyncFunction
  * @Author Wenzhen.Xie
  * @Date 2025/4/17 14:31
  * @description: DimAsyncFunction

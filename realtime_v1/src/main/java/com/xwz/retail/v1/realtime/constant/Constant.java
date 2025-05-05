@@ -1,7 +1,7 @@
 package com.xwz.retail.v1.realtime.constant;
 
 /**
- * @Package com.lzy.retail.v1.realtime.constant.Constant
+ * @Package com.xwz.retail.v1.realtime.constant.Constant
  * @Author Wenzhen.Xie
  * @Date 2025/4/7 22:09
  * @description: Constant

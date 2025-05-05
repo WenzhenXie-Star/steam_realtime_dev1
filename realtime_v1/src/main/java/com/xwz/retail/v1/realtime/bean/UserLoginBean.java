@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @Package com.lzy.retail.v1.realtime.bean.UserLoginBean
- * @Author zheyuan.liu
+ * @Package com.xwz.retail.v1.realtime.bean.UserLoginBean
+ * @Author Wenzhen.Xie
  * @Date 2025/4/8 9:01
  * @description: UserLoginBean
  */

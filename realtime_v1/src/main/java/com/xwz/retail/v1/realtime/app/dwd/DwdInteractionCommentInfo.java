@@ -8,7 +8,7 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 /**
- * @Package com.lzy.stream.realtime.v1.app.bwd.DwdInteractionCommentInfo
+ * @Package  com.xwz.retail.v1.realtime.app.dwd.DwdInteractionCommentInfo
  * @Author Wenzhen.Xie
  * @Date 2025/4/11 15:50
  * @description: DwdInteractionCommentInfo
