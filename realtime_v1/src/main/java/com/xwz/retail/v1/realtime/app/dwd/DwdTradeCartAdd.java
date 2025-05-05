@@ -30,7 +30,7 @@ public class DwdTradeCartAdd {
                 "  `op` string, \n" +
                 "  ts_ms bigint " +
                 ")" + SQLUtil.getKafkaDDL(Constant.TOPIC_DB, Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO));
-//        tableEnv.executeSql("select * from topic_db").print();
+        tableEnv.executeSql("select * from topic_db").print();
 
 
         tableEnv.executeSql("CREATE TABLE base_dic (\n" +
@@ -50,7 +50,7 @@ public class DwdTradeCartAdd {
                 "   from topic_db \n" +
                 "   where source['table'] = 'cart_info' \n" +
                 "   and ( op = 'r' or \n" +
-                "   ( op='r' and after['sku_num'] is not null and (CAST(after['sku_num'] AS INT) > CAST(after['sku_num'] AS INT))))"
+                "   (op='r' and after['sku_num'] is not null and (CAST(after['sku_num'] AS INT) > CAST(after['sku_num'] AS INT))))"
         );
 //        cartInfo.execute().print();
 
@@ -65,6 +65,7 @@ public class DwdTradeCartAdd {
 
         cartInfo.executeInsert(Constant.TOPIC_DWD_TRADE_CART_ADD);
 
-        env.execute("dwd_kafka");
+        env.disableOperatorChaining();
+        //env.execute("dwd_kafka");
     }
 }

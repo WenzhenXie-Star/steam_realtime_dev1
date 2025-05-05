@@ -27,7 +27,7 @@ import org.apache.flink.util.Collector;
 import org.apache.hadoop.hbase.client.Connection;
 
 /**
- * @Package com.xwz.retail.v1.realtime.app.dim
+ * @Package com.xwz.retail.v1.realtime.app.dim.BaseApp;
  * @Author Wenzhen.Xie
  * @Date 2025/4/11 8:39
  * @description: BaseApp

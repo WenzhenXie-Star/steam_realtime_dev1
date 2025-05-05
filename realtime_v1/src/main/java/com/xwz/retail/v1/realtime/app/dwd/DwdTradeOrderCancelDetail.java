@@ -130,6 +130,7 @@ public class DwdTradeOrderCancelDetail {
                         "  )" + SQLUtil.getUpsertKafkaDDL(Constant.TOPIC_DWD_TRADE_ORDER_CANCEL));
         result.executeInsert(Constant.TOPIC_DWD_TRADE_ORDER_CANCEL);
 
-        env.execute("DwdTradeOrderCancelDetail");
+        env.disableOperatorChaining();
+        //env.execute("DwdTradeOrderCancelDetail");
     }
 }

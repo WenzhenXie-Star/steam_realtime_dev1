@@ -66,7 +66,7 @@ public class DwdInteractionCommentInfo {
                 "    FROM comment_info AS c\n" +
                 "    JOIN base_dic AS dic\n" +
                 "    ON c.appraise = dic.dic_code");
-//        joinedTable.execute().print();
+        joinedTable.execute().print();
 
         //创建动态表和要写入的主题进行映射
         tableEnv.executeSql("CREATE TABLE "+ Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO+" (\n" +
@@ -82,6 +82,7 @@ public class DwdInteractionCommentInfo {
         // 写入
         joinedTable.executeInsert(Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO);
 
-        env.execute("dwd_join");
+        env.disableOperatorChaining();
+        //env.execute("dwd_join");
     }
 }
