@@ -1,6 +1,6 @@
 package com.xwz.retail.v1.realtime.function;
 
-import com.lzy.stream.realtime.v1.utils.KeywordUtil;
+import com.xwz.retail.v1.realtime.utils.KeywordUtil;
 import org.apache.flink.table.annotation.DataTypeHint;
 import org.apache.flink.table.annotation.FunctionHint;
 import org.apache.flink.table.functions.TableFunction;
@@ -8,7 +8,7 @@ import org.apache.flink.types.Row;
 
 /**
  * @Package com.lzy.stream.realtime.v1.function.KeywordUDTF
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/18 18:57
  * @description: KeywordUDTF
  */

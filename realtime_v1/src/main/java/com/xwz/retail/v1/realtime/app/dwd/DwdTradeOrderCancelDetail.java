@@ -11,7 +11,7 @@ import java.time.Duration;
 
 /**
  * @Package com.lzy.stream.realtime.v1.app.bwd.DwdTradeOrderCancelDetail
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/13 18:53
  * @description: DwdTradeOrderCancelDetail
  */

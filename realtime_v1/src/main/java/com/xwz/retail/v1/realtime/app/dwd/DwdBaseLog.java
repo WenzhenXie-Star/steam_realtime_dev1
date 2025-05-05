@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * @Package com.lzy.stream.realtime.v1.app.bwd.DwdBaseLog
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/11 10:35
  * @description: DwdBaseLog
  */

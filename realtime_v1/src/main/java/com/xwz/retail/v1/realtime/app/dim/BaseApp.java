@@ -28,7 +28,7 @@ import org.apache.hadoop.hbase.client.Connection;
 
 /**
  * @Package com.lzy.stream.realtime.v1.base.BaseApp
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/11 8:39
  * @description: BaseApp
  */

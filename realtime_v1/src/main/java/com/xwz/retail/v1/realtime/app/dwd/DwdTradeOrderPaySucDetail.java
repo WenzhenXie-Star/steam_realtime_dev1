@@ -11,7 +11,7 @@ import java.time.Duration;
 
 /**
  * @Package com.lzy.stream.realtime.v1.app.bwd.DwdTradeOrderPaySucDetail
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/14 11:04
  * @description: DwdTradeOrderPaySucDetail
  */

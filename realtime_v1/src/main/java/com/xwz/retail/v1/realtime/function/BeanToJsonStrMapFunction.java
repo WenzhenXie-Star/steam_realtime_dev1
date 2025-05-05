@@ -7,7 +7,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 
 /**
  * @Package com.lzy.stream.realtime.v1.function.BeanToJsonStrMapFunction
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/14 14:29
  * @description: BeanToJsonStrMapFunction
  */

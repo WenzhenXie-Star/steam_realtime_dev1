@@ -32,7 +32,7 @@ import org.apache.flink.util.Collector;
 
 /**
  * @Package com.lzy.stream.realtime.v1.app.dws.DwsTrafficHomeDetailPageViewWindow
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/18 15:03
  * @description: DwsTrafficHomeDetailPageViewWindow
  */

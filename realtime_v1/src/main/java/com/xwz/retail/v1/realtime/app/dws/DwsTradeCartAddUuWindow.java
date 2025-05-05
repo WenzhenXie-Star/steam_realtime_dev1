@@ -32,7 +32,7 @@ import org.apache.flink.util.Collector;
 
 /**
  * @Package com.lzy.stream.realtime.v1.app.dws.DwsTradeCartAddUuWindow
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/21 14:31
  * @description: DwsTradeCartAddUuWindow
  */

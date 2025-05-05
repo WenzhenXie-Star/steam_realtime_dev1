@@ -2,7 +2,7 @@ package com.xwz.retail.v1.realtime.constant;
 
 /**
  * @Package com.lzy.retail.v1.realtime.constant.Constant
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/7 22:09
  * @description: Constant
  */

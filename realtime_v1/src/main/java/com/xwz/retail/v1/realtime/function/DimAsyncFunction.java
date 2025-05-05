@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 /**
  * @Package com.lzy.stream.realtime.v1.function.DimAsyncFunction
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/17 14:31
  * @description: DimAsyncFunction
  */

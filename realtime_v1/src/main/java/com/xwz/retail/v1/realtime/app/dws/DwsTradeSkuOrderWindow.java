@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Package com.lzy.stream.realtime.v1.app.dws.DwsTradeSkuOrderWindow
- * @Author zheyuan.liu
+ * @Author Wenzhen.Xie
  * @Date 2025/4/18 13:52
  * @description: DwsTradeSkuOrderWindow
  */
