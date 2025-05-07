@@ -127,7 +127,7 @@ public class DwsTradeProvinceOrderWindow {
                 }
         );
 
-//        beanDS.print();
+        beanDS.print();
 
         KeyedStream<TradeProvinceOrderBean, String> provinceIdKeyedDS = beanDS.keyBy(TradeProvinceOrderBean::getProvinceId);
 
@@ -161,7 +161,7 @@ public class DwsTradeProvinceOrderWindow {
                 }
         );
 
-//        reduceDS.print();
+        reduceDS.print();
 
         SingleOutputStreamOperator<TradeProvinceOrderBean> withProvinceDS = AsyncDataStream.unorderedWait(
                 reduceDS,
@@ -190,6 +190,7 @@ public class DwsTradeProvinceOrderWindow {
 
         sink.sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_province_order_window"));
 
+        env.disableOperatorChaining();
         env.execute("DwsTradeProvinceOrderWindow");
     }
 }

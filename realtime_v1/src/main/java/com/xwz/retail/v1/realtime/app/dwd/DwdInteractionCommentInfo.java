@@ -32,7 +32,7 @@ public class DwdInteractionCommentInfo {
                 "  `op` string, \n" +
                 "  `ts_ms` bigint " +
                 ")" + SQLUtil.getKafkaDDL(Constant.TOPIC_DB, Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO));
-//        tableEnv.executeSql("select * from topic_db").print();
+        tableEnv.executeSql("select * from topic_db").print();
 
         Table commentInfo = tableEnv.sqlQuery("select  \n" +
                 "    `after`['id'] as id, \n" +
@@ -43,7 +43,7 @@ public class DwdInteractionCommentInfo {
                 "    `after`['create_time'] as create_time, " +
                 "     ts_ms " +
                 "     from topic_db where source['table'] = 'comment_info' and op = 'r'");
-//        commentInfo.execute().print();
+        commentInfo.execute().print();
 
         tableEnv.createTemporaryView("comment_info",commentInfo);
 
@@ -53,7 +53,7 @@ public class DwdInteractionCommentInfo {
                 " info ROW<dic_name string>,\n" +
                 " PRIMARY KEY (dic_code) NOT ENFORCED\n" +
                 ") " + SQLUtil.getHBaseDDL("dim_base_dic"));
-//        tableEnv.executeSql("select * from base_dic").print();
+        tableEnv.executeSql("select * from base_dic").print();
 
         Table joinedTable = tableEnv.sqlQuery("SELECT  \n" +
                 "    id,\n" +

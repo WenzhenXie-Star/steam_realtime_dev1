@@ -35,7 +35,7 @@ public class DwdTradeOrderCancelDetail {
                 "  `op` string, \n" +
                 "  ts_ms bigint " +
                 ")" + SQLUtil.getKafkaDDL(Constant.TOPIC_DB, Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO));
-//        tableEnv.executeSql("select * from topic_db").print();
+        tableEnv.executeSql("select * from topic_db").print();
 
 
         tableEnv.executeSql("CREATE TABLE base_dic (\n" +
@@ -44,7 +44,7 @@ public class DwdTradeOrderCancelDetail {
                 " PRIMARY KEY (dic_code) NOT ENFORCED\n" +
                 ") " + SQLUtil.getHBaseDDL("dim_base_dic")
         );
-//        tableEnv.executeSql("select * from base_dic").print();
+        tableEnv.executeSql("select * from base_dic").print();
         
         Table orderCancel = tableEnv.sqlQuery("select " +
                 " `after`['id'] as id, " +
@@ -56,7 +56,7 @@ public class DwdTradeOrderCancelDetail {
                 " and `after`['order_status'] = '1001' " +
                 " or `after`['order_status'] = '1003' ");
         tableEnv.createTemporaryView("order_cancel", orderCancel);
-//        orderCancel.execute().print();
+        orderCancel.execute().print();
 
 
         //TODO 从下单事实表中获取下单数据
@@ -104,7 +104,7 @@ public class DwdTradeOrderCancelDetail {
                         "  from dwd_trade_order_detail od " +
                         "  join order_cancel oc " +
                         "  on od.order_id = oc.id ");
-//        result.execute().print();
+        result.execute().print();
 
         //TODO 将关联的结果写到kafka主题中
         tableEnv.executeSql(

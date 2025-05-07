@@ -39,7 +39,7 @@ public class DwdTradeCartAdd {
                 " PRIMARY KEY (dic_code) NOT ENFORCED\n" +
                 ") " + SQLUtil.getHBaseDDL("dim_base_dic")
         );
-//        tableEnv.executeSql("select * from base_dic").print();
+        tableEnv.executeSql("select * from base_dic").print();
 
         Table cartInfo = tableEnv.sqlQuery("select \n" +
                 "   `after`['id'] id,\n" +
@@ -52,7 +52,7 @@ public class DwdTradeCartAdd {
                 "   and ( op = 'r' or \n" +
                 "   (op='r' and after['sku_num'] is not null and (CAST(after['sku_num'] AS INT) > CAST(after['sku_num'] AS INT))))"
         );
-//        cartInfo.execute().print();
+        cartInfo.execute().print();
 
         tableEnv.executeSql(" create table "+Constant.TOPIC_DWD_TRADE_CART_ADD+"(\n" +
                 "    id string,\n" +

@@ -34,7 +34,7 @@ public class DwdTradeOrderPaySucDetail {
                 "  `op` string, \n" +
                 "  ts_ms bigint " +
                 ")" + SQLUtil.getKafkaDDL(Constant.TOPIC_DB, Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO));
-//        tableEnv.executeSql("select * from topic_db").print();
+        tableEnv.executeSql("select * from topic_db").print();
 
 
         tableEnv.executeSql("CREATE TABLE base_dic (\n" +
@@ -43,7 +43,7 @@ public class DwdTradeOrderPaySucDetail {
                 " PRIMARY KEY (dic_code) NOT ENFORCED\n" +
                 ") " + SQLUtil.getHBaseDDL("dim_base_dic")
         );
-//        tableEnv.executeSql("select * from base_dic").print();
+        tableEnv.executeSql("select * from base_dic").print();
 
         //TODO 从下单事实表读取数据 创建动态表
         tableEnv.executeSql(
@@ -81,7 +81,7 @@ public class DwdTradeOrderPaySucDetail {
                 "and `after`['payment_status'] is not null " +
                 "and `after`['payment_status'] = '1602' ");
         tableEnv.createTemporaryView("payment_info", paymentInfo);
-//        paymentInfo.execute().print();
+        paymentInfo.execute().print();
 
         //TODO 和字典进行关联---lookup join 和下单数据进行关联---IntervalJoin
         Table result = tableEnv.sqlQuery(
@@ -106,7 +106,7 @@ public class DwdTradeOrderPaySucDetail {
                         "from payment_info pi " +
                         "join dwd_trade_order_detail od " +
                         "on pi.order_id = od.order_id ");
-//        result.execute().print();
+        result.execute().print();
 
         //TODO 将关联的结果写到kafka主题中
         tableEnv.executeSql("create table "+Constant.TOPIC_DWD_TRADE_ORDER_PAYMENT_SUCCESS+"(" +

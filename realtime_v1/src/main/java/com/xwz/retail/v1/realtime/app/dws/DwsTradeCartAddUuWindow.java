@@ -147,6 +147,7 @@ public class DwsTradeCartAddUuWindow {
 
         operator.sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_cart_add_uu_window"));
 
+        env.disableOperatorChaining();
         env.execute("DwsTradeCartAddUuWindow");
     }
 }

@@ -34,7 +34,7 @@ public class DwdTradeRefundPaySucDetail {
                 "  `op` string, \n" +
                 "  ts_ms bigint " +
                 ")" + SQLUtil.getKafkaDDL(Constant.TOPIC_DB, Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO));
-//        tableEnv.executeSql("select * from topic_db").print();
+        tableEnv.executeSql("select * from topic_db").print();
 
 
         tableEnv.executeSql("CREATE TABLE base_dic (\n" +
@@ -43,7 +43,7 @@ public class DwdTradeRefundPaySucDetail {
                 " PRIMARY KEY (dic_code) NOT ENFORCED\n" +
                 ") " + SQLUtil.getHBaseDDL("dim_base_dic")
         );
-//        tableEnv.executeSql("select * from base_dic").print();
+        tableEnv.executeSql("select * from base_dic").print();
 
         // 3. 过滤退款成功表数据
         Table refundPayment = tableEnv.sqlQuery(
@@ -61,7 +61,7 @@ public class DwdTradeRefundPaySucDetail {
                         " and `after`['refund_status'] is not null " +
                         " and `after`['refund_status']='1602'");
         tableEnv.createTemporaryView("refund_payment", refundPayment);
-//        refundPayment.execute().print();
+        refundPayment.execute().print();
 
         // 4. 过滤退单表中的退单成功的数据
         Table orderRefundInfo = tableEnv.sqlQuery(
@@ -75,7 +75,7 @@ public class DwdTradeRefundPaySucDetail {
                         " and `after`['refund_status'] is not null " +
                         " and `after`['refund_status']='0705'");
         tableEnv.createTemporaryView("order_refund_info", orderRefundInfo);
-//        orderRefundInfo.execute().print();
+        orderRefundInfo.execute().print();
 
         // 5. 过滤订单表中的退款成功的数据
         Table orderInfo = tableEnv.sqlQuery(
@@ -89,7 +89,7 @@ public class DwdTradeRefundPaySucDetail {
                         "and `after`['order_status'] is not null " +
                         "and `after`['order_status']='1006'");
         tableEnv.createTemporaryView("order_info", orderInfo);
-//        orderInfo.execute().print();
+        orderInfo.execute().print();
 
         // 6. 4 张表的 join
         Table result = tableEnv.sqlQuery(
@@ -110,7 +110,7 @@ public class DwdTradeRefundPaySucDetail {
                         " on rp.order_id=ori.order_id and rp.sku_id=ori.sku_id " +
                         " join order_info oi " +
                         " on rp.order_id=oi.id ");
-//        result.execute().print();
+        result.execute().print();
 
         // 7.写出到 kafka
         tableEnv.executeSql("create table "+Constant.TOPIC_DWD_TRADE_REFUND_PAYMENT_SUCCESS+"(" +
@@ -129,8 +129,10 @@ public class DwdTradeRefundPaySucDetail {
                 " PRIMARY KEY (id) NOT ENFORCED " +
                 ")" + SQLUtil.getUpsertKafkaDDL(Constant.TOPIC_DWD_TRADE_REFUND_PAYMENT_SUCCESS));
         result.executeInsert(Constant.TOPIC_DWD_TRADE_REFUND_PAYMENT_SUCCESS);
-        
-        env.execute("DwdTradeRefundPaySucDetail");
+
+
+        env.disableOperatorChaining();
+//        env.execute("DwdTradeRefundPaySucDetail");
 
 
     }
