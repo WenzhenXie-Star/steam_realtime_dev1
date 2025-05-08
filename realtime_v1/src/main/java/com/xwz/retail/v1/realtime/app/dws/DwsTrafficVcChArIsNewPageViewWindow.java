@@ -110,7 +110,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
                 }
         );
 
-//        beanDS.print();
+        beanDS.print();
 
         SingleOutputStreamOperator<TrafficVcChArIsNewPageViewBean> withWatermarkDS = beanDS.assignTimestampsAndWatermarks(
                 WatermarkStrategy
@@ -125,7 +125,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
                         )
         );
 
-//        withWatermarkDS.print();
+        withWatermarkDS.print();
 
         KeyedStream<TrafficVcChArIsNewPageViewBean, Tuple4<String, String, String, String>> dimKeyedDS = withWatermarkDS.keyBy(
                 new KeySelector<TrafficVcChArIsNewPageViewBean, Tuple4<String, String, String, String>>() {
@@ -168,7 +168,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
                 }
         );
 
-//        reduceDS.print();
+        reduceDS.print();
 
         SingleOutputStreamOperator<String> jsonMap = reduceDS
                 .map(new BeanToJsonStrMapFunction<>());
@@ -177,6 +177,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
 
         jsonMap.sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_vc_ch_ar_is_new_page_view_window"));
 
+        env.disableOperatorChaining();
         env.execute("DwsTrafficVcChArIsNewPageViewWindow");
     }
 }

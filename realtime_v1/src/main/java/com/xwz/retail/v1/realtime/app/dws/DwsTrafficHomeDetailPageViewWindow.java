@@ -168,6 +168,7 @@ public class DwsTrafficHomeDetailPageViewWindow {
 
         jsonMap.sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_home_detail_page_view_window"));
 
+        env.disableOperatorChaining();
         env.execute("DwsTrafficHomeDetailPageViewWindow");
 
     }

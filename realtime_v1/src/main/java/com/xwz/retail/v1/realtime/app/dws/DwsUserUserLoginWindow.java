@@ -162,6 +162,7 @@ public class DwsUserUserLoginWindow {
 
         jsonMap.sinkTo(FlinkSinkUtil.getDorisSink("dws_user_user_login_window"));
 
+        env.disableOperatorChaining();
         env.execute("DwsUserUserLoginWindow");
     }
 }

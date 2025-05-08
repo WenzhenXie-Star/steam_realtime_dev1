@@ -6,7 +6,6 @@ import com.xwz.retail.v1.realtime.bean.TradeSkuOrderBean;
 import com.xwz.retail.v1.realtime.function.BeanToJsonStrMapFunction;
 import com.xwz.retail.v1.realtime.function.DimAsyncFunction;
 import com.xwz.retail.v1.realtime.utils.DateFormatUtil;
-import com.xwz.retail.v1.realtime.utils.FlinkSinkUtil;
 import com.xwz.retail.v1.realtime.utils.FlinkSourceUtil;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -87,8 +86,8 @@ public class DwsTradeSkuOrderWindow {
                             long currentProcessingTime = ctx.timerService().currentProcessingTime();
                             ctx.timerService().registerProcessingTimeTimer(currentProcessingTime + 5000L);
                         } else {
-                            String lastTs = lastJsonObj.getString("聚合时间戳");
-                            String curTs = jsonObj.getString("聚合时间戳");
+                            String lastTs = lastJsonObj.getString("ts_ms");
+                            String curTs = jsonObj.getString("ts_ms");
                             if (curTs.compareTo(lastTs) >= 0) {
                                 lastJsonObjState.update(jsonObj);
                             }
@@ -342,9 +341,9 @@ public class DwsTradeSkuOrderWindow {
 
         jsonOrder.print();
 
-        jsonOrder.sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_sku_order_window"));
+//        jsonOrder.sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_sku_order_window"));
 
-
+        env.disableOperatorChaining();
         env.execute("DwsTradeSkuOrderWindow");
     }
 }

@@ -32,7 +32,7 @@ public class DwsTrafficSourceKeywordPageViewWindow {
                 "     ts TIMESTAMP(3) METADATA FROM 'timestamp', \n" +
                 "     WATERMARK FOR ts AS ts - INTERVAL '3' SECOND \n" +
                 ")" + SQLUtil.getKafkaDDL(Constant.TOPIC_DWD_TRAFFIC_PAGE,"dws_traffic_source_keyword_page_view_window"));
-//        tableEnv.executeSql("select * from page_log").print();
+        tableEnv.executeSql("select * from page_log").print();
 
         Table searchTable = tableEnv.sqlQuery("select \n" +
                 "   page['item']  fullword,\n" +
@@ -40,13 +40,13 @@ public class DwsTrafficSourceKeywordPageViewWindow {
                 " from page_log\n" +
                 " where page['last_page_id'] = 'search' and page['item_type'] ='keyword' and page['item'] is not null");
         tableEnv.createTemporaryView("search_table",searchTable);
-//        searchTable.execute().print();
+        searchTable.execute().print();
 
 
         Table splitTable = tableEnv.sqlQuery("SELECT keyword,ts FROM search_table,\n" +
                 "LATERAL TABLE(ik_analyze(fullword)) t(keyword)");
         tableEnv.createTemporaryView("split_table",splitTable);
-//        tableEnv.executeSql("select * from split_table").print();
+        tableEnv.executeSql("select * from split_table").print();
 
         Table resTable = tableEnv.sqlQuery("SELECT \n" +
                 "  date_format(window_start, 'yyyy-MM-dd HH:mm:ss') stt,\n" +
@@ -57,7 +57,7 @@ public class DwsTrafficSourceKeywordPageViewWindow {
                 "  FROM TABLE(\n" +
                 "  TUMBLE(TABLE split_table, DESCRIPTOR(ts), INTERVAL '10' second))\n" +
                 "  GROUP BY window_start, window_end, keyword");
-//        resTable.execute().print();
+        resTable.execute().print();
 
         tableEnv.executeSql("create table dws_traffic_source_keyword_page_view_window(" +
                 "  stt string, " +  // 2023-07-11 14:14:14
@@ -79,7 +79,7 @@ public class DwsTrafficSourceKeywordPageViewWindow {
                 ")");
         resTable.executeInsert("dws_traffic_source_keyword_page_view_window");
 
-
-        env.execute("DwsTrafficSourceKeywordPageViewWindow");
+        env.disableOperatorChaining();
+//        env.execute("DwsTrafficSourceKeywordPageViewWindow");
     }
 }
