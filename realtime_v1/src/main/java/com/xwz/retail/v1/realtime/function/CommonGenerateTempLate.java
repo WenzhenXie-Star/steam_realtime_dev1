@@ -1,12 +1,13 @@
-package com.xwz.retail.v1.realtime.utils;
+package com.xwz.retail.v1.realtime.function;
 
+import com.xwz.retail.v1.realtime.utils.ConfigUtils;
 
-import static com.xwz.retail.v1.realtime.utils.SiliconFlowApi.generateBadReview;
+import static com.xwz.retail.v1.realtime.function.SiliconFlowApi.generateBadReview;
 
 /**
  * @Package com.stream.utils.CommonGenerateTempLate
- * @Author zhou.han
- * @Date 2025/3/16 19:43
+ * @Author zhao.shuai.fei
+ * @Date 2025/5/5 20:47
  * @description: TempLate
  */
 public class CommonGenerateTempLate {
@@ -15,7 +16,7 @@ public class CommonGenerateTempLate {
 
     private static final String COMMENT = "差评";
 
-    private static final String API_TOKEN = "sk-pfaasdbkktgnunlvoapothvybwflwdteckwmhakzqbthcgnj";
+    private static final String API_TOKEN = ConfigUtils.getString("silicon.api.token");
 
     public static String GenerateComment(String comment,String productName){
         if (comment.equals(COMMENT)){
@@ -29,5 +30,7 @@ public class CommonGenerateTempLate {
                 API_TOKEN
         );
     }
+
+
 
 }

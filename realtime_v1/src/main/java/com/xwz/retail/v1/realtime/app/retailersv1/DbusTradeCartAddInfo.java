@@ -46,7 +46,6 @@ public class DbusTradeCartAddInfo {
                 KafkaUtils.buildKafkaSource(
                         kafka_botstrap_servers,
                         kafka_cdc_db_topic,
-                        new Date().toString(),
                         OffsetsInitializer.earliest()
                 ),
                 WatermarkStrategy.<String>forBoundedOutOfOrderness(Duration.ofSeconds(3))

@@ -3,7 +3,6 @@ package com.xwz.retail.v1.realtime.function;
 import avro.shaded.com.google.common.cache.Cache;
 import avro.shaded.com.google.common.cache.CacheBuilder;
 import com.alibaba.fastjson.JSONObject;
-
 import com.xwz.retail.v1.realtime.utils.HbaseUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.async.ResultFuture;
@@ -23,9 +22,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Package com.retailersv1.func.AsyncHbaseDimBaseDicFunc
- * @Author zhou.han
- * @Date 2025/3/15 20:47
+ * @Package com.zsf.func.AsyncHbaseDimBaseDicFunc
+ * @Author zhao.shuai.fei
+ * @Date 2025/5/5 20:47
  * @description: Async DimBaseDic
  */
 public class AsyncHbaseDimBaseDicFunc extends RichAsyncFunction<JSONObject,JSONObject> {
@@ -38,7 +37,7 @@ public class AsyncHbaseDimBaseDicFunc extends RichAsyncFunction<JSONObject,JSONO
     @Override
     public void open(Configuration parameters) throws Exception {
         hbaseConn = new HbaseUtils("cdh01:2181,cdh02:2181,cdh03:2181").getConnection();
-        dimTable = hbaseConn.getTable(TableName.valueOf("realtime_v2:dim_base_dic"));
+        dimTable = hbaseConn.getTable(TableName.valueOf("sx_002:dim_base_dic"));
         cache = CacheBuilder.newBuilder()
                 .maximumSize(1000)
                 .expireAfterWrite(10, TimeUnit.MINUTES)

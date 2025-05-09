@@ -2,6 +2,7 @@ package com.xwz.retail.v1.realtime.utils;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.xwz.retail.v1.realtime.constant.Constant;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
@@ -79,15 +80,13 @@ public final class KafkaUtils {
         }
     }
 
-    public static KafkaSource<String> buildKafkaSource(String bootServerList,String kafkaTopic,String group,OffsetsInitializer offset){
+    public static KafkaSource<String> buildKafkaSource(String kafkaTopic,String group,OffsetsInitializer offset){
         return KafkaSource.<String>builder()
-                .setBootstrapServers(bootServerList)
+                .setBootstrapServers(Constant.KAFKA_BROKERS)
                 .setTopics(kafkaTopic)
                 .setGroupId(group)
                 .setStartingOffsets(offset)
                 .setValueOnlyDeserializer(new SimpleStringSchema())
-                // 自动发现消费的partition变化
-                .setProperty("flink.partition-discovery.interval-millis",String.valueOf(10 * 1000))
                 .build();
     }
 

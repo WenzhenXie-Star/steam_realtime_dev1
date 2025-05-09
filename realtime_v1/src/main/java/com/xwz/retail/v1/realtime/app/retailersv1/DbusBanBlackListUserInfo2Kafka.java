@@ -5,71 +5,53 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.houbb.sensitive.word.core.SensitiveWordHelper;
 import com.xwz.retail.v1.realtime.function.FilterBloomDeduplicatorFunc;
 import com.xwz.retail.v1.realtime.function.MapCheckRedisSensitiveWordsFunc;
-import com.xwz.retail.v1.realtime.utils.ConfigUtils;
-import com.xwz.retail.v1.realtime.utils.EnvironmentSettingUtils;
-import com.xwz.retail.v1.realtime.utils.KafkaUtils;
+import com.xwz.retail.v1.realtime.utils.KafkaUtil;
 import lombok.SneakyThrows;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-import java.util.Date;
 import java.util.List;
 
 /**
- * @Package com.xwz.retail.v1.realtime.app.func.DbusBanBlackListUserInfo2Kafka
- * @Author  Wenzhen.Xie
- * @Date  2025/5/7 9:58
- * @description: 
-*/
-
+ * @Package com.zsf.retail_v1.realtime.func.DbusBanBlackListUserInfo2Kafka
+ * @Author zhao.shuai.fei
+ * @Date 2025/5/8 14:38
+ * @description: 黑名单封禁 Task-02
+ */
 public class DbusBanBlackListUserInfo2Kafka {
-    private static final String kafka_botstrap_servers = ConfigUtils.getString("kafka.bootstrap.servers");
-    private static final String kafka_db_fact_comment_topic = ConfigUtils.getString("kafka.db.fact.comment.topic");
-    private static final String kafka_result_sensitive_words_topic = ConfigUtils.getString("kafka.result.sensitive.words.topic");
-
     @SneakyThrows
     public static void main(String[] args) {
-
-        System.setProperty("HADOOP_USER_NAME","root");
-
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        EnvironmentSettingUtils.defaultParameter(env);
+        env.setParallelism(10);
 
-        SingleOutputStreamOperator<String> kafkaCdcDbSource = env.fromSource(
-                KafkaUtils.buildKafkaSource(
-                        kafka_botstrap_servers,
-                        kafka_db_fact_comment_topic,
-                        new Date().toString(),
-                        OffsetsInitializer.earliest()
-                ),
-                WatermarkStrategy.noWatermarks(),
-                "kafka_cdc_db_source"
-        ).uid("kafka_fact_comment_source").name("kafka_fact_comment_source");
+        DataStreamSource<String> kafkaSource = KafkaUtil.getKafkaSource(env, "topic_db_sw", "groupId");
 
+        //转json
+        SingleOutputStreamOperator<JSONObject> mapJsonStr = kafkaSource.map(JSON::parseObject).uid("to_json_string").name("to_json_string");
 
-
-        SingleOutputStreamOperator<JSONObject> mapJsonStr = kafkaCdcDbSource.map(JSON::parseObject).uid("to_json_string").name("to_json_string");
-
+        //通过布隆过滤器，去掉重复数据
         SingleOutputStreamOperator<JSONObject> bloomFilterDs = mapJsonStr.keyBy(data -> data.getLong("order_id"))
                 .filter(new FilterBloomDeduplicatorFunc(1000000, 0.01));
 
+        //敏感词检测
         SingleOutputStreamOperator<JSONObject> SensitiveWordsDs = bloomFilterDs.map(new MapCheckRedisSensitiveWordsFunc())
                 .uid("MapCheckRedisSensitiveWord")
                 .name("MapCheckRedisSensitiveWord");
 
-
-
+        //二次检测敏感词
         SingleOutputStreamOperator<JSONObject> secondCheckMap = SensitiveWordsDs.map(new RichMapFunction<JSONObject, JSONObject>() {
             @Override
             public JSONObject map(JSONObject jsonObject) {
+                //如果首次检查时判定为非违规 == 0
                 if (jsonObject.getIntValue("is_violation") == 0) {
+                    // 则对 msg 字段进行进一步的敏感词查找
                     String msg = jsonObject.getString("msg");
                     List<String> msgSen = SensitiveWordHelper.findAll(msg);
+                    //更新 is_violation 和 violation_msg 字段
                     if (msgSen.size() > 0) {
-                        jsonObject.put("is_violation", "P1");
+                        jsonObject.put("violation_grade", "P1");
                         jsonObject.put("violation_msg", String.join(", ", msgSen));
                     }
                 }
@@ -77,15 +59,9 @@ public class DbusBanBlackListUserInfo2Kafka {
             }
         }).uid("second sensitive word check").name("second sensitive word check");
 
-        secondCheckMap.print();
-
-        secondCheckMap.map(data -> data.toJSONString())
-                .sinkTo(
-                        KafkaUtils.buildKafkaSink(kafka_botstrap_servers, kafka_result_sensitive_words_topic)
-                )
-                .uid("sink to kafka result sensitive words topic")
-                .name("sink to kafka result sensitive words topic");
-
+        //写入kafka
+        SingleOutputStreamOperator<String> mapped = secondCheckMap.map(s -> s.toJSONString());
+        mapped.addSink(KafkaUtil.getKafkaSink("topic_db_blacklist"));
 
         env.execute();
     }
