@@ -10,8 +10,8 @@ package com.xwz.retail.v1.realtime.constant;
 public class Constant {
     public static final String KAFKA_BROKERS = "cdh01:9092,cdh02:9092,cdh03:9092";
 
-    public static final String TOPIC_DB = "topic_db";
-    public static final String TOPIC_LOG = "topic_log";
+    public static final String TOPIC_DB = "Damopan_topic_db";
+    public static final String TOPIC_LOG = "Damopan_topic_log";
 
     public static final String MYSQL_HOST = "cdh03";
     public static final int MYSQL_PORT = 3306;

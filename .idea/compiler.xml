@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="realtime_v1" />
+        <module name="realtime_dev2" />
       </profile>
     </annotationProcessing>
   </component>

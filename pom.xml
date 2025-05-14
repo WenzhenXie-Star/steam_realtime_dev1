@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>realtime_v1</module>
+        <module>realtime_dev2</module>
     </modules>
 
     <properties>

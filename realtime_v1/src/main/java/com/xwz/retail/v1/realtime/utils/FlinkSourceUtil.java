@@ -3,14 +3,11 @@ package com.xwz.retail.v1.realtime.utils;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
-import com.ververica.cdc.debezium.StringDebeziumDeserializationSchema;
 import com.xwz.retail.v1.realtime.constant.Constant;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 
 import java.util.Properties;
 
@@ -56,6 +53,7 @@ public class FlinkSourceUtil {
         Properties properties = new Properties();
         properties.setProperty("decimal.handling.mode", "double");
         properties.setProperty("time.precision.mode","connect");
+        properties.setProperty("database.connectionCharset", "UTF-8");
 
         MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
                 .hostname(Constant.MYSQL_HOST)

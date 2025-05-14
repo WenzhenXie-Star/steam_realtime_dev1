@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding" defaultCharsetForPropertiesFiles="GBK">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/pom.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_dev2/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_dev2/src/main/java/com/xwz/retail/v2/reaktime/app/ods/MysqlToKafka.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_dev2/src/main/java/com/xwz/retail/v2/reaktime/func/ad.json" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/realtime_dev2/src/main/java/com/xwz/retail/v2/reaktime/func/sdf" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/realtime_dev2/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/realtime_v1" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/app/retailersv1/DbusBanBlackListUserInfo2Kafka.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/app/retailersv1/DbusDBCommentFactData2Kafka.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/AsyncHbaseDimBaseDicFunc.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/CommonGenerateTempLate.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/IntervalJoinOrderCommentAndOrderInfoFunc.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/MapCheckRedisSensitiveWordsFunc.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/SiliconFlowApi.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/utils/KafkaUtil.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/utils/KafkaUtils.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/app/retailersv1/DbusBanBlackListUserInfo2Kafka.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/app/retailersv1/DbusDBCommentFactData2Kafka.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/AsyncHbaseDimBaseDicFunc.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/CommonGenerateTempLate.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/IntervalJoinOrderCommentAndOrderInfoFunc.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/MapCheckRedisSensitiveWordsFunc.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/function/SiliconFlowApi.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/utils/FlinkSourceUtil.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/utils/KafkaUtil.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/realtime_v1/src/main/java/com/xwz/retail/v1/realtime/utils/KafkaUtils.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/realtime_v1/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
-    <file url="PROJECT" charset="GBK" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>
